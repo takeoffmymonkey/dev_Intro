@@ -1,6 +1,9 @@
 package com.example.intro.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,6 +49,11 @@ public class RetroFragment extends Fragment {
                 dbHelper.createNotesCursor());
         listView.setAdapter(adapter);
 
+        // Prepare Add button
+        FloatingActionButton fab = (FloatingActionButton)
+                view.findViewById(R.id.fab);
+        setOnClickListenerForButton(fab);
+
         // Return the view
         return view;
     }
@@ -54,6 +62,15 @@ public class RetroFragment extends Fragment {
     private void setOnClickListenerForList(ListView listView) {
         listView.setOnItemClickListener((adapterView, view, i, l) -> {
             // Do smth
+        });
+    }
+
+
+    private void setOnClickListenerForButton(FloatingActionButton fab) {
+        fab.setOnClickListener(view1 -> {
+            Intent intent = new Intent(getActivity(),
+                    AddEditActivity.class);
+            startActivity(intent);
         });
     }
 }
