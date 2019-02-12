@@ -5,33 +5,39 @@ import android.content.ContentValues;
 import static com.example.intro.ui.MainActivity.dbHelper;
 
 public class EventHelper {
+    private String TAG = "INTROVERT:" + getClass().getSimpleName();
+
     Event e;
 
-    static String table = DbHelper.EVENTS_TABLE;
-    static String nameColumn = DbHelper.EVENTS_NAME_COLUMN;
-    static String tagsColumn = DbHelper.EVENTS_TAGS_COLUMN;
-    static String dateCreatedColumn = DbHelper.EVENTS_DATE_CREATED_COLUMN;
-    static String dateCompleteColumn = DbHelper.EVENTS_DATE_COMPLETE_COLUMN;
-    static String completeColumn = DbHelper.EVENTS_COMPLETE_COLUMN;
-    static String commentColumn = DbHelper.EVENTS_COMMENT_COLUMN;
-    static String priorityColumn = DbHelper.EVENTS_PRIORITY_COLUMN;
-    static String iconColumn = DbHelper.EVENTS_ICON_COLUMN;
-    static String contentTypeColumn = DbHelper.EVENTS_CONTENT_TYPE_COLUMN;
-    static String contentColumn = DbHelper.EVENTS_CONTENT_COLUMN;
+    static String table = dbHelper.EVENTS_TABLE;
+    static String nameColumn = dbHelper.EVENTS_NAME_COLUMN;
+    static String tagsColumn = dbHelper.EVENTS_TAGS_COLUMN;
+    static String dateCreatedColumn = dbHelper.EVENTS_DATE_CREATED_COLUMN;
+    static String dateCompleteColumn = dbHelper.EVENTS_DATE_COMPLETE_COLUMN;
+    static String completeColumn = dbHelper.EVENTS_COMPLETE_COLUMN;
+    static String commentColumn = dbHelper.EVENTS_COMMENT_COLUMN;
+    static String priorityColumn = dbHelper.EVENTS_PRIORITY_COLUMN;
+    static String iconColumn = dbHelper.EVENTS_ICON_COLUMN;
+    static String contentTypeColumn = dbHelper.EVENTS_CONTENT_TYPE_COLUMN;
+    static String contentColumn = dbHelper.EVENTS_CONTENT_COLUMN;
 
 
-    public static boolean updateEvent(Event e) {
-        boolean fresh = false;
-        if (e.getId() == -1) fresh = true;
-
+    public static boolean updateDbWithEvent(Event e) {
+        // Prepare data for DB
         ContentValues contentValues = new ContentValues();
         contentValues.put(nameColumn, e.getName());
         contentValues.put(tagsColumn, e.getTags());
         contentValues.put(contentColumn, e.getContent());
         contentValues.put(commentColumn, e.getComment());
 
-        if (fresh) dbHelper.insertRow(table, contentValues);
+        // Update DB depending on if this is a new Event
+        boolean result = false;
+        if (isNewEvent(e)) result = dbHelper.insertRow(table, contentValues);
+        return result;
+    }
 
-        return true;
+
+    public static boolean isNewEvent(Event e) {
+        return e.getId() == 0;
     }
 }

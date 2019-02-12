@@ -5,42 +5,42 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 public class MyPagerAdapter extends FragmentPagerAdapter {
-    private static int NUM_ITEMS = 3;
+    private String TAG = "INTROVERT:" + getClass().getSimpleName();
 
-    public MyPagerAdapter(FragmentManager fragmentManager) {
+
+    MyPagerAdapter(FragmentManager fragmentManager) {
         super(fragmentManager);
     }
 
-    // Returns total number of pages
+
     @Override
     public int getCount() {
-        return NUM_ITEMS;
+        return 3;
     }
 
-    // Returns the fragment to display for that page
-    @Override
+
+    @Override // Fragment to display
     public Fragment getItem(int position) {
         switch (position) {
-            case 0: // Fragment # 0 - This will show FutureFragment
-                return PastFragment.newInstance(0, "Page # 1");
-            case 1: // Fragment # 0 - This will show FutureFragment different title
-                return TodayFragment.newInstance(1, "Page # 2");
-            case 2: // Fragment # 0 - This will show FutureFragment different title
-                return FutureFragment.newInstance(1, "Page # 3");
+            case 0:
+                return RetroFragment.newInstance(0, "Retro");
+            case 1:
             default:
-                return null;
+                return TodayFragment.newInstance(1, "Today");
+            case 2:
+                return FutureFragment.newInstance(2, "Future");
         }
     }
 
-    // Returns the page title for the top indicator
-    @Override
+
+    @Override // Tab's title
     public CharSequence getPageTitle(int position) {
         switch (position) {
-            case 0: // Fragment # 0 - This will show FutureFragment
+            case 0:
                 return "Retro";
-            case 1: // Fragment # 0 - This will show FutureFragment different title
+            case 1:
                 return "Today";
-            case 2: // Fragment # 0 - This will show FutureFragment different title
+            case 2:
                 return "Future";
             default:
                 return null;

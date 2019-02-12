@@ -12,13 +12,13 @@ import com.example.intro.R;
 
 import static com.example.intro.ui.MainActivity.dbHelper;
 
-public class FutureFragment extends Fragment {
+public class RetroFragment extends Fragment {
     private String TAG = "INTROVERT:" + getClass().getSimpleName();
 
 
     // newInstance constructor for creating fragment with arguments
-    public static FutureFragment newInstance(int page, String title) {
-        FutureFragment fragment = new FutureFragment();
+    public static RetroFragment newInstance(int page, String title) {
+        RetroFragment fragment = new RetroFragment();
         Bundle args = new Bundle();
         args.putInt("page", page);
         args.putString("title", title);
@@ -36,10 +36,24 @@ public class FutureFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_future, container,
+        View view = inflater.inflate(R.layout.fragment_retro, container,
                 false);
+
+        // Prepare list, its listener and adapter
+        ListView listView = (ListView) view.findViewById(R.id.lvEvents);
+        setOnClickListenerForList(listView);
+        EventsAdapter adapter = new EventsAdapter(getContext(),
+                dbHelper.createNotesCursor());
+        listView.setAdapter(adapter);
 
         // Return the view
         return view;
+    }
+
+
+    private void setOnClickListenerForList(ListView listView) {
+        listView.setOnItemClickListener((adapterView, view, i, l) -> {
+            // Do smth
+        });
     }
 }

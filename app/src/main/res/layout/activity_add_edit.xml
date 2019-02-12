@@ -18,7 +18,7 @@
             android:orientation="vertical">
 
             <EditText
-                android:id="@+id/addEdit_Name"
+                android:id="@+id/et_Name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
@@ -26,7 +26,7 @@
                 android:inputType="textPersonName" />
 
             <EditText
-                android:id="@+id/addEdit_Tags"
+                android:id="@+id/et_Tags"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
@@ -34,7 +34,7 @@
                 android:inputType="textMultiLine" />
 
             <EditText
-                android:id="@+id/addEdit_Content"
+                android:id="@+id/et_Content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
@@ -42,7 +42,7 @@
                 android:inputType="textMultiLine" />
 
             <EditText
-                android:id="@+id/addEdit_Comment"
+                android:id="@+id/et_Comment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
@@ -50,13 +50,13 @@
                 android:inputType="textMultiLine" />
 
             <CheckBox
-                android:id="@+id/addEdit_Complete"
+                android:id="@+id/cb_Complete"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Complete" />
 
             <Button
-                android:id="@+id/addEdit_save"
+                android:id="@+id/bt_save"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Save" />

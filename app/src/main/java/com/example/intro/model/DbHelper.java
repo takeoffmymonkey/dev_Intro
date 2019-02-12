@@ -12,10 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DbHelper extends SQLiteOpenHelper {
-    private SQLiteDatabase db;
-
     private String TAG = "INTROVERT:" + getClass().getSimpleName();
 
+    private SQLiteDatabase db;
     private final String ID_COLUMN = BaseColumns._ID;
 
     /*DATABASE*/
@@ -23,43 +22,44 @@ public class DbHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     /*EVENTS TABLE*/
-    public static final String EVENTS_TABLE = "Events";
-    public static final String EVENTS_NAME_COLUMN = "Name";
-    static final String EVENTS_TAGS_COLUMN = "Tags";
-    static final String EVENTS_DATE_CREATED_COLUMN = "DateCreated";
-    static final String EVENTS_DATE_COMPLETE_COLUMN = "DateComplete";
-    static final String EVENTS_COMPLETE_COLUMN = "Complete";
-    static final String EVENTS_COMMENT_COLUMN = "Comment";
-    static final String EVENTS_PRIORITY_COLUMN = "Priority";
-    static final String EVENTS_ICON_COLUMN = "Icon";
-    static final String EVENTS_CONTENT_TYPE_COLUMN = "ContentType";
-    static final String EVENTS_CONTENT_COLUMN = "Content";
+    public final String EVENTS_TABLE = "Events";
+    public final String EVENTS_NAME_COLUMN = "Name";
+    final String EVENTS_TAGS_COLUMN = "Tags";
+    final String EVENTS_DATE_CREATED_COLUMN = "DateCreated";
+    final String EVENTS_DATE_COMPLETE_COLUMN = "DateComplete";
+    final String EVENTS_COMPLETE_COLUMN = "Complete";
+    final String EVENTS_COMMENT_COLUMN = "Comment";
+    final String EVENTS_PRIORITY_COLUMN = "Priority";
+    final String EVENTS_ICON_COLUMN = "Icon";
+    final String EVENTS_CONTENT_TYPE_COLUMN = "ContentType";
+    final String EVENTS_CONTENT_COLUMN = "Content";
 
 
     public DbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+
     @Override
     public void onCreate(SQLiteDatabase db) {
-        Log.i(TAG, "OnCreate");
         createTable(EVENTS_TABLE, db);
     }
 
+
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-
     }
 
-    private void createTable(String table, SQLiteDatabase db) {
-        Log.i(TAG, "createTable");
 
+    /* ~~~~~~~~~~~~~~~~~~~~~ UTILITY METHODS ~~~~~~~~~~~~~~~~~~~~~ */
+    /* ~~~~~~~~~~~~~~~ CREATION ~~~~~~~~~~~~~~~*/
+    private void createTable(String table, SQLiteDatabase db) {
         String SQL_CREATE_TABLE = createTableCommand(table);
         db.execSQL(SQL_CREATE_TABLE);
     }
 
+
     private String createTableCommand(String table) {
-        Log.i(TAG, "createTableCommand");
         String SQL_CREATE_TABLE = null;
 
         switch (table) {
@@ -83,14 +83,15 @@ public class DbHelper extends SQLiteOpenHelper {
         return SQL_CREATE_TABLE;
     }
 
-    private boolean ensureReadiness(String table) {
-        Log.i(TAG, "ensureReadiness");
+
+    /* ~~~~~~~~~~~~~~~ CHECKING ~~~~~~~~~~~~~~~*/
+    private boolean isReady() {
         if (db == null) db = getWritableDatabase();
         return true;
     }
 
-    /* ~~~~~~~~~~~~~~~~~~~~~ UTILITY METHODS ~~~~~~~~~~~~~~~~~~~~~ */
-    /* ~~~~~~~INSERT METHODS~~~~~~~ */
+
+    /* ~~~~~~~~~~~~~~~ INSERTION ~~~~~~~~~~~~~~~*/
     boolean insertRow(String table, ContentValues values) {
         List<ContentValues> contentValues = new ArrayList<>();
         contentValues.add(values);
@@ -99,8 +100,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
 
     boolean insertRows(String table, List<ContentValues> values) {
-        Log.i(TAG, "insertRows");
-        if (!ensureReadiness(table)) return false;
+        if (!isReady()) return false;
 
         db.beginTransaction();
         try {
@@ -115,37 +115,38 @@ public class DbHelper extends SQLiteOpenHelper {
         return true;
     }
 
-    public Cursor createNotesCursor(SQLiteDatabase db) {
-        if (db == null) db = getWritableDatabase();
 
-        String[] projection = {ID_COLUMN,
-                EVENTS_NAME_COLUMN};
+    /* ~~~~~~~~~~~~~~~ CURSOR ~~~~~~~~~~~~~~~*/
+    public Cursor createNotesCursor() {
+        if (!isReady()) return null;
+
+        String[] projection = {ID_COLUMN, EVENTS_NAME_COLUMN};
 
         return db.query(
                 EVENTS_TABLE,   // The table to query
-                projection,             // The array of columns to return (pass null to get all)
-                null,              // The columns for the WHERE clause
-                null,          // The values for the WHERE clause
-                null,                   // don't group the rows
-                null,                   // don't filter by row groups
-                null               // The sort order
+                projection,     // The array of columns to return (pass null to get all)
+                null,   // The columns for the WHERE clause
+                null,// The values for the WHERE clause
+                null,    // don't group the rows
+                null,     // don't filter by row groups
+                null     // The sort order
         );
     }
 
+
+    /* ~~~~~~~~~~~~~~~ DEBUGGING ~~~~~~~~~~~~~~~*/
     public void dumpTable(String table) {
-        Log.i(TAG, "dumpTable");
+        if (!isReady()) return;
 
-        ensureReadiness(EVENTS_TABLE);
-
-        Cursor c = db.query(table, null, null, null,
-                null, null, null);
+        Cursor c = db.query(table, null, null,
+                null, null, null, null);
 
         String[] columns = c.getColumnNames();
 
-        Log.i(TAG, "========================================================");
+        Log.i(TAG, "===================================================");
         Log.i(TAG, table + " table");
         Log.i(TAG, "Number of rows: " + c.getCount());
-        Log.i(TAG, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        Log.i(TAG, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
         c.moveToFirst();
         for (int i = 0; i < c.getCount(); i++) { // Moving through rows
@@ -153,11 +154,11 @@ public class DbHelper extends SQLiteOpenHelper {
                 Log.i(TAG, column + ": " + c.getString(c.getColumnIndex
                         (column)));
             }
-            Log.i(TAG, "---------------------------------");
+            Log.i(TAG, "------------------------------");
             c.moveToNext();
         }
 
-        Log.i(TAG, "========================================================");
+        Log.i(TAG, "===================================================");
 
         c.close();
     }

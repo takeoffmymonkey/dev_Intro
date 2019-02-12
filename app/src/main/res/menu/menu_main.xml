@@ -8,7 +8,7 @@
         <menu>
             <item
                 android:id="@+id/menu_dump"
-                android:title="Dump"/>
+                android:title="Dump DB"/>
             <item
                 android:id="@+id/menu_add"
                 android:title="AddEdit"/>

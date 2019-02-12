@@ -6,17 +6,16 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.example.intro.R;
 import com.example.intro.model.DbHelper;
 
 public class MainActivity extends AppCompatActivity {
-
     private String TAG = "INTROVERT:" + getClass().getSimpleName();
+
     public static DbHelper dbHelper;
-    FragmentPagerAdapter adapterViewPager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,37 +24,33 @@ public class MainActivity extends AppCompatActivity {
 
         dbHelper = new DbHelper(this);
 
+        // Setting Pager
         ViewPager vpPager = (ViewPager) findViewById(R.id.vpPager);
         vpPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
-            // This method will be invoked when a new page becomes selected.
             @Override
             public void onPageSelected(int position) {
             }
 
-            // This method will be invoked when the current page is scrolled
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                // Code goes here
+            public void onPageScrolled(int position, float positionOffset,
+                                       int positionOffsetPixels) {
             }
 
-            // Called when the scroll state changes:
-            // SCROLL_STATE_IDLE, SCROLL_STATE_DRAGGING, SCROLL_STATE_SETTLING
-            @Override
+            @Override // SCROLL_STATE_IDLE, S_S_DRAGGING, S_S_SETTLING
             public void onPageScrollStateChanged(int state) {
-                // Code goes here
             }
         });
 
-        adapterViewPager = new MyPagerAdapter(getSupportFragmentManager());
+        // Setting Adapter for Pager
+        FragmentPagerAdapter adapterViewPager =
+                new MyPagerAdapter(getSupportFragmentManager());
         vpPager.setAdapter(adapterViewPager);
-
     }
 
 
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -64,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_dump:
-                dbHelper.dumpTable(DbHelper.EVENTS_TABLE);
+                dbHelper.dumpTable(dbHelper.EVENTS_TABLE);
                 return true;
             case R.id.menu_add:
                 Intent intent = new Intent(MainActivity.this,

@@ -13,37 +13,52 @@ import com.example.intro.model.EventHelper;
 import com.example.intro.R;
 
 public class AddEditActivity extends AppCompatActivity {
+    private String TAG = "INTROVERT:" + getClass().getSimpleName();
+
+    EditText name, tags, content, comment;
+    CheckBox complete;
+    Button save;
 
     Event e;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_edit);
 
-        EditText name = (EditText) findViewById(R.id.addEdit_Name);
-        EditText tags = (EditText) findViewById(R.id.addEdit_Tags);
-        EditText content = (EditText) findViewById(R.id.addEdit_Content);
-        EditText comment = (EditText) findViewById(R.id.addEdit_Comment);
-        CheckBox complete = (CheckBox) findViewById(R.id.addEdit_Complete);
+        // UI elements
+        name = (EditText) findViewById(R.id.et_Name);
+        tags = (EditText) findViewById(R.id.et_Tags);
+        content = (EditText) findViewById(R.id.et_Content);
+        comment = (EditText) findViewById(R.id.et_Comment);
+        complete = (CheckBox) findViewById(R.id.cb_Complete);
+        save = (Button) findViewById(R.id.bt_save);
 
-        Button save = (Button) findViewById(R.id.addEdit_save);
+        // Listener for the button
+        setButtonListener(save);
+    }
+
+
+    private void setButtonListener(Button save) {
         save.setOnClickListener(view -> {
-
+            // Prepare Event object
             e = new Event();
             e.setName(name.getText().toString());
             e.setTags(tags.getText().toString());
             e.setContent(content.getText().toString());
             e.setComment(comment.getText().toString());
 
-            Intent intent = new Intent(AddEditActivity.this,
-                    MainActivity.class);
-            if (EventHelper.updateEvent(e)) {
+            // Update DB and inform user
+            if (EventHelper.updateDbWithEvent(e)) {
                 Toast.makeText(this, e.getName() + " saved",
                         Toast.LENGTH_SHORT).show();
             }
+
+            // Launch previous activity
+            Intent intent = new Intent(AddEditActivity.this,
+                    MainActivity.class);
             startActivity(intent);
         });
-
     }
 }
