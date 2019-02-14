@@ -3,7 +3,6 @@ package com.example.intro.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +16,7 @@ import static com.example.intro.ui.MainActivity.dbHelper;
 
 public class RetroFragment extends Fragment {
     private String TAG = "INTROVERT:" + getClass().getSimpleName();
-
+    public static String EVENT_ID = "id";
 
     // newInstance constructor for creating fragment with arguments
     public static RetroFragment newInstance(int page, String title) {
@@ -44,7 +43,7 @@ public class RetroFragment extends Fragment {
 
         // Prepare list, its listener and adapter
         ListView listView = (ListView) view.findViewById(R.id.lvEvents);
-        setOnClickListenerForList(listView);
+        setOnClickListenersForList(listView);
         EventsAdapter adapter = new EventsAdapter(getContext(),
                 dbHelper.createNotesCursor());
         listView.setAdapter(adapter);
@@ -59,9 +58,18 @@ public class RetroFragment extends Fragment {
     }
 
 
-    private void setOnClickListenerForList(ListView listView) {
+    private void setOnClickListenersForList(ListView listView) {
         listView.setOnItemClickListener((adapterView, view, i, l) -> {
-            // Do smth
+            Intent intent = new Intent(getActivity(),
+                    AddEditActivity.class);
+            intent.putExtra("id", l);
+            startActivity(intent);
+        });
+
+
+        listView.setOnItemLongClickListener((parent, view, position, id) -> {
+            Toast.makeText(getContext(), "" + id, Toast.LENGTH_SHORT).show();
+            return true;
         });
     }
 

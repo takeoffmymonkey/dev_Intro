@@ -6,10 +6,14 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
+import android.support.v4.util.LongSparseArray;
 import android.util.Log;
+import android.util.SparseArray;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DbHelper extends SQLiteOpenHelper {
     private String TAG = "INTROVERT:" + getClass().getSimpleName();
@@ -67,15 +71,22 @@ public class DbHelper extends SQLiteOpenHelper {
                 SQL_CREATE_TABLE =
                         "CREATE TABLE " + EVENTS_TABLE + " ("
                                 + ID_COLUMN + " INTEGER PRIMARY KEY, "
-                                + EVENTS_NAME_COLUMN + " TEXT, "
+                                + EVENTS_NAME_COLUMN + " TEXT "
+                                + "NOT NULL DEFAULT 0, "
                                 + EVENTS_TAGS_COLUMN + " TEXT, "
-                                + EVENTS_DATE_CREATED_COLUMN + " INTEGER, "
-                                + EVENTS_DATE_COMPLETE_COLUMN + " INTEGER, "
-                                + EVENTS_COMPLETE_COLUMN + " INTEGER, "
+                                + EVENTS_DATE_CREATED_COLUMN + " INTEGER "
+                                + "NOT NULL DEFAULT 0, "
+                                + EVENTS_DATE_COMPLETE_COLUMN + " INTEGER "
+                                + "NOT NULL DEFAULT 0, "
+                                + EVENTS_COMPLETE_COLUMN + " INTEGER "
+                                + "NOT NULL DEFAULT 0, "
                                 + EVENTS_COMMENT_COLUMN + " TEXT, "
-                                + EVENTS_PRIORITY_COLUMN + " INTEGER, "
-                                + EVENTS_ICON_COLUMN + " INTEGER, "
-                                + EVENTS_CONTENT_TYPE_COLUMN + " INTEGER, "
+                                + EVENTS_PRIORITY_COLUMN + " INTEGER "
+                                + "NOT NULL DEFAULT 0, "
+                                + EVENTS_ICON_COLUMN + " INTEGER "
+                                + "NOT NULL DEFAULT 0, "
+                                + EVENTS_CONTENT_TYPE_COLUMN + " INTEGER "
+                                + "NOT NULL DEFAULT 0, "
                                 + EVENTS_CONTENT_COLUMN + " TEXT);";
                 break;
         }
@@ -91,7 +102,7 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
 
-    /* ~~~~~~~~~~~~~~~ INSERTION ~~~~~~~~~~~~~~~*/
+    /* ~~~~~~~~~~~~~~~ INSERT ~~~~~~~~~~~~~~~*/
     boolean insertRow(String table, ContentValues values) {
         List<ContentValues> contentValues = new ArrayList<>();
         contentValues.add(values);
@@ -116,6 +127,179 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
 
+    /* ~~~~~~~~~~~~~~~ READ ~~~~~~~~~~~~~~~*/
+    /* ~~~~~~~~~~ Columns ~~~~~~~~~~*/
+    public String[] getColumnNames(String table) {
+        if (!isReady()) return null;
+
+        String[] columns;
+        try (Cursor c = db.query(table, null, null,
+                null, null, null, null)) {
+            columns = c.getColumnNames();
+        }
+
+        return columns;
+    }
+
+
+    private String[] getColumn(String table, String column) {
+        return getColumnFiltered(table, column, null,
+                null);
+    }
+
+
+    private String[] getColumnFiltered(String table, String column,
+                                       String where, String whereArg) {
+        if (!isReady()) return null;
+
+        String[] list = null;
+        try (Cursor c = db.query(
+                table, // Table to query
+                new String[]{column, where}, // Array of columns
+                where + "=?", // Columns for WHERE clause
+                new String[]{whereArg}, // Values for WHERE clause
+                null, // Don't group rows
+                null, // Don't filter by row groups
+                null)) { // Sort order
+
+            int count = c.getCount();
+            if (count > 0) {
+                list = new String[count];
+                c.moveToFirst();
+                for (int i = 0; i < count; i++) {
+                    list[i] = c.getString(c.getColumnIndex(column));
+                }
+            }
+        }
+
+        return list;
+    }
+
+
+    /* ~~~~~~~~~~ Cells ~~~~~~~~~~*/
+    private String getCellValue(String table, String column, long id) {
+        return getColumnFiltered(table, column, ID_COLUMN,
+                Long.toString(id))[0];
+    }
+
+
+    /* ~~~~~~~~~~ Rows ~~~~~~~~~~*/
+    public String[] getRow(String table, long row) {
+        return getFilteredRow(table, row, null);
+    }
+
+
+    private String[] getFilteredRow(String table, long row, String[] columns) {
+        if (!isReady()) return null;
+
+        // Create array for values and columns (if needed)
+        if (columns == null) columns = getColumnNames(table);
+        String[] values = new String[columns.length];
+
+        try (Cursor c = db.query(table, columns,
+                ID_COLUMN + "=?", new String[]{Long.toString(row)},
+                null, null, null)) {
+            if (c.getCount() == 1) {
+                c.moveToFirst();
+                for (int i = 0; i < values.length; i++) {
+                    values[i] = c.getString(c.getColumnIndex(columns[i]));
+                }
+            }
+        }
+
+        return values;
+    }
+
+
+    public Map<String, String> getMappedRow(String table, long row) {
+        return getMappedFilteredRow(table, row, null);
+    }
+
+
+    private Map<String, String> getMappedFilteredRow(
+            String table, long row, String[] columns) {
+        Map<String, String> map = new HashMap<>();
+
+        if (columns == null) columns = getColumnNames(table);
+
+        String[] values = getFilteredRow(table, row, columns);
+
+        for (int i = 0; i < values.length; i++) {
+            map.put(columns[i], values[i]);
+        }
+
+        return map;
+    }
+
+
+    /* ~~~~~~~~~~~~~~~ UPDATE ~~~~~~~~~~~~~~~*/
+    boolean updateRow(String table, ContentValues values, long row) {
+        LongSparseArray<ContentValues> array = new LongSparseArray<>();
+        array.put(row, values);
+        return updateRows(table, array);
+    }
+
+
+    private boolean updateRows(String table,
+                               LongSparseArray<ContentValues> updates) {
+        if (!isReady()) return false;
+
+        long key;
+        ContentValues cv;
+
+        db.beginTransaction();
+        try {
+            for (int i = 0; i < updates.size(); i++) {
+                key = updates.keyAt(i);
+                cv = updates.get(key);
+                String[] args = new String[]{Long.toString(key)};
+                Log.i (TAG, args[0]);
+                db.update(table, cv, ID_COLUMN + "=?",
+                        new String[]{Long.toString(key)});
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+
+        return true;
+    }
+
+
+    /* ~~~~~~~~~~~~~~~ DELETE ~~~~~~~~~~~~~~~*/
+    public boolean deleteRow(String table, long row) {
+        return deleteRows(table, new long[]{row});
+    }
+
+
+    private boolean deleteRows(String table, long[] rows) {
+        if (!isReady()) return false;
+
+        db.beginTransaction();
+        try {
+            for (long row : rows) {
+                db.delete(table, ID_COLUMN + "=?",
+                        new String[]{Long.toString(row)});
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+
+        return true;
+    }
+
+
+    private boolean deleteTable(String table) {
+        if (!isReady()) return false;
+
+        String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + table;
+        db.execSQL(SQL_DELETE_TABLE);
+
+        return true;
+    }
+
+
     /* ~~~~~~~~~~~~~~~ CURSOR ~~~~~~~~~~~~~~~*/
     public Cursor createNotesCursor() {
         if (!isReady()) return null;
@@ -123,13 +307,13 @@ public class DbHelper extends SQLiteOpenHelper {
         String[] projection = {ID_COLUMN, EVENTS_NAME_COLUMN};
 
         return db.query(
-                EVENTS_TABLE,   // The table to query
-                projection,     // The array of columns to return (pass null to get all)
-                null,   // The columns for the WHERE clause
-                null,// The values for the WHERE clause
-                null,    // don't group the rows
-                null,     // don't filter by row groups
-                null     // The sort order
+                EVENTS_TABLE,   // Table to query
+                projection,     // Array of columns to return
+                null,   // Columns for WHERE clause
+                null,// Values for WHERE clause
+                null,    // Don't group rows
+                null,     // Don't filter by row groups
+                null     // Sort order
         );
     }
 

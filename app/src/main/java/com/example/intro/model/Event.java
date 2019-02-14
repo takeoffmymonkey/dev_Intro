@@ -3,7 +3,7 @@ package com.example.intro.model;
 public class Event {
     private String TAG = "INTROVERT:" + getClass().getSimpleName();
 
-    private int id = 0;
+    private long id = 0;
     private String name;
     private String tags;
     private long dateCreated;
@@ -16,12 +16,12 @@ public class Event {
     private String content;
 
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -123,5 +123,23 @@ public class Event {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Event{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", tags='" + tags + '\'' +
+                ", dateCreated=" + dateCreated +
+                ", dateComplete=" + dateComplete +
+                ", complete=" + complete +
+                ", comment='" + comment + '\'' +
+                ", priority=" + priority +
+                ", icon=" + icon +
+                ", contentType=" + contentType +
+                ", content='" + content + '\'' +
+                '}';
     }
 }
