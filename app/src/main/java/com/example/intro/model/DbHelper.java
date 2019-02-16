@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 import android.support.v4.util.LongSparseArray;
 import android.util.Log;
-import android.util.SparseArray;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +37,11 @@ public class DbHelper extends SQLiteOpenHelper {
     final String EVENTS_CONTENT_TYPE_COLUMN = "ContentType";
     final String EVENTS_CONTENT_COLUMN = "Content";
 
+    /*TAGS TABLE*/
+    public final String TAGS_TABLE = "Tags";
+    public final String TAGS_TAG_COLUMN = "Tag";
+    public final String TAGS_EVENTS_COLUMN = "Events";
+
 
     public DbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -47,6 +51,8 @@ public class DbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         createTable(EVENTS_TABLE, db);
+        createTable(TAGS_TABLE, db);
+        initContent(TAGS_TABLE, db);
     }
 
 
@@ -89,9 +95,41 @@ public class DbHelper extends SQLiteOpenHelper {
                                 + "NOT NULL DEFAULT 0, "
                                 + EVENTS_CONTENT_COLUMN + " TEXT);";
                 break;
+            case TAGS_TABLE:
+                SQL_CREATE_TABLE =
+                        "CREATE TABLE " + TAGS_TABLE + " ("
+                                + ID_COLUMN + " INTEGER PRIMARY KEY, "
+                                + TAGS_TAG_COLUMN + " TEXT UNIQUE"
+                                + "NOT NULL, "
+                                + TAGS_EVENTS_COLUMN + " TEXT);";
+                break;
         }
 
         return SQL_CREATE_TABLE;
+    }
+
+
+    /* ~~~~~~~~~~~~~~~ INITIATION ~~~~~~~~~~~~~~~*/
+    private void initContent(String table, SQLiteDatabase db) {
+        insertRows(table, getInitValues(table), db);
+    }
+
+
+    private List<ContentValues> getInitValues(String table) {
+        List<ContentValues> values = new ArrayList<>();
+
+        switch (table) {
+            case TAGS_TABLE:
+                String[] tags = {"Diary", "Weight", "Joke", "Thought",
+                        "Dream", "Idea", "Track", "Mix", "Spending",
+                        "ASaT/ALaT"};
+                for (String tag : tags) {
+                    ContentValues v = new ContentValues();
+                    v.put(TAGS_TAG_COLUMN, tag);
+                    values.add(v);
+                }
+        }
+        return values;
     }
 
 
@@ -103,15 +141,17 @@ public class DbHelper extends SQLiteOpenHelper {
 
 
     /* ~~~~~~~~~~~~~~~ INSERT ~~~~~~~~~~~~~~~*/
-    boolean insertRow(String table, ContentValues values) {
+    boolean insertRow(String table, ContentValues values,
+                      SQLiteDatabase db) {
         List<ContentValues> contentValues = new ArrayList<>();
         contentValues.add(values);
-        return insertRows(table, contentValues);
+        return insertRows(table, contentValues, db);
     }
 
 
-    boolean insertRows(String table, List<ContentValues> values) {
-        if (!isReady()) return false;
+    boolean insertRows(String table, List<ContentValues> values,
+                       SQLiteDatabase db) {
+        if (db == null) db = getWritableDatabase();
 
         db.beginTransaction();
         try {
@@ -142,22 +182,30 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
 
-    private String[] getColumn(String table, String column) {
-        return getColumnFiltered(table, column, null,
+    String[] getColumn(String table, String column) {
+        return getFilteredColumn(table, column, null,
                 null);
     }
 
 
-    private String[] getColumnFiltered(String table, String column,
+    private String[] getFilteredColumn(String table, String column,
                                        String where, String whereArg) {
         if (!isReady()) return null;
+
+
+        // Precautions for null where and whereArg
+        String[] whereArgum = null;
+        if (where != null) {
+            where = where + "=?";
+            whereArgum = new String[]{whereArg};
+        }
 
         String[] list = null;
         try (Cursor c = db.query(
                 table, // Table to query
-                new String[]{column, where}, // Array of columns
-                where + "=?", // Columns for WHERE clause
-                new String[]{whereArg}, // Values for WHERE clause
+                new String[]{column}, // Array of columns
+                where, // Columns for WHERE clause
+                whereArgum, // Values for WHERE clause
                 null, // Don't group rows
                 null, // Don't filter by row groups
                 null)) { // Sort order
@@ -168,6 +216,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 c.moveToFirst();
                 for (int i = 0; i < count; i++) {
                     list[i] = c.getString(c.getColumnIndex(column));
+                    c.moveToNext();
                 }
             }
         }
@@ -178,7 +227,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     /* ~~~~~~~~~~ Cells ~~~~~~~~~~*/
     private String getCellValue(String table, String column, long id) {
-        return getColumnFiltered(table, column, ID_COLUMN,
+        return getFilteredColumn(table, column, ID_COLUMN,
                 Long.toString(id))[0];
     }
 
@@ -189,7 +238,8 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
 
-    private String[] getFilteredRow(String table, long row, String[] columns) {
+    private String[] getFilteredRow(String table, long row,
+                                    String[] columns) {
         if (!isReady()) return null;
 
         // Create array for values and columns (if needed)
@@ -253,7 +303,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 key = updates.keyAt(i);
                 cv = updates.get(key);
                 String[] args = new String[]{Long.toString(key)};
-                Log.i (TAG, args[0]);
+                Log.i(TAG, args[0]);
                 db.update(table, cv, ID_COLUMN + "=?",
                         new String[]{Long.toString(key)});
             }
@@ -328,7 +378,7 @@ public class DbHelper extends SQLiteOpenHelper {
         String[] columns = c.getColumnNames();
 
         Log.i(TAG, "===================================================");
-        Log.i(TAG, table + " table");
+        Log.i(TAG, table + " eventsTable");
         Log.i(TAG, "Number of rows: " + c.getCount());
         Log.i(TAG, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 

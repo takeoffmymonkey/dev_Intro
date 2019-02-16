@@ -58,8 +58,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_dump:
+            case R.id.menu_dump_events:
                 dbHelper.dumpTable(dbHelper.EVENTS_TABLE);
+                return true;
+            case R.id.menu_dump_tags:
+                dbHelper.dumpTable(dbHelper.TAGS_TABLE);
                 return true;
             case R.id.menu_add:
                 Intent intent = new Intent(MainActivity.this,

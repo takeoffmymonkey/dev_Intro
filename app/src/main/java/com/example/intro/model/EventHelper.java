@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.util.Log;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,17 +15,14 @@ public class EventHelper {
 
     Event e;
 
-    static String table = dbHelper.EVENTS_TABLE;
-    static String nameColumn = dbHelper.EVENTS_NAME_COLUMN;
-    static String tagsColumn = dbHelper.EVENTS_TAGS_COLUMN;
-    static String dateCreatedColumn = dbHelper.EVENTS_DATE_CREATED_COLUMN;
-    static String dateCompleteColumn = dbHelper.EVENTS_DATE_COMPLETE_COLUMN;
-    static String completeColumn = dbHelper.EVENTS_COMPLETE_COLUMN;
-    static String commentColumn = dbHelper.EVENTS_COMMENT_COLUMN;
-    static String priorityColumn = dbHelper.EVENTS_PRIORITY_COLUMN;
-    static String iconColumn = dbHelper.EVENTS_ICON_COLUMN;
-    static String contentTypeColumn = dbHelper.EVENTS_CONTENT_TYPE_COLUMN;
-    static String contentColumn = dbHelper.EVENTS_CONTENT_COLUMN;
+    static String eventsTable = dbHelper.EVENTS_TABLE;
+    static String eventsNameColumn = dbHelper.EVENTS_NAME_COLUMN;
+    static String eventsTagsColumn = dbHelper.EVENTS_TAGS_COLUMN;
+    static String eventsCommentColumn = dbHelper.EVENTS_COMMENT_COLUMN;
+    static String eventsContentColumn = dbHelper.EVENTS_CONTENT_COLUMN;
+
+    static String tagsTable = dbHelper.TAGS_TABLE;
+    static String tagsTagColumn = dbHelper.TAGS_TAG_COLUMN;
 
 
     public static boolean isNewEvent(Event e) {
@@ -38,7 +36,7 @@ public class EventHelper {
         boolean isOld = id != 0;
 
         if (isOld) {
-            Map<String, String> map = dbHelper.getMappedRow(table, id);
+            Map<String, String> map = dbHelper.getMappedRow(eventsTable, id);
             Set<String> keySet = map.keySet();
 
             for (String key : keySet) {
@@ -86,20 +84,28 @@ public class EventHelper {
     public static boolean updateDbWithEvent(Event e) {
         // Prepare data for DB
         ContentValues contentValues = new ContentValues();
-        contentValues.put(nameColumn, e.getName());
-        contentValues.put(tagsColumn, e.getTags());
-        contentValues.put(contentColumn, e.getContent());
-        contentValues.put(commentColumn, e.getComment());
+        contentValues.put(eventsNameColumn, e.getName());
+        contentValues.put(eventsTagsColumn, e.getTags());
+        contentValues.put(eventsContentColumn, e.getContent());
+        contentValues.put(eventsCommentColumn, e.getComment());
 
         // Update DB depending on if this is a new Event
         boolean result;
-        if (isNewEvent(e)) result = dbHelper.insertRow(table, contentValues);
-        else result = dbHelper.updateRow(table, contentValues, e.getId());
+        if (isNewEvent(e)) result = dbHelper.insertRow(eventsTable,
+                contentValues, dbHelper.getWritableDatabase());
+        else result = dbHelper.updateRow(eventsTable, contentValues,
+                e.getId());
         return result;
     }
 
 
     public static boolean deleteEventFromDb(Event e) {
-        return dbHelper.deleteRow(table, e.getId());
+        return dbHelper.deleteRow(eventsTable, e.getId());
+    }
+
+
+    public static List<String> getTagsList() {
+        String[] tags = dbHelper.getColumn(tagsTable, tagsTagColumn);
+        return Arrays.asList(tags);
     }
 }

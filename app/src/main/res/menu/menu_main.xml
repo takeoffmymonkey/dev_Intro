@@ -7,8 +7,11 @@
         app:showAsAction="always">
         <menu>
             <item
-                android:id="@+id/menu_dump"
-                android:title="Dump DB"/>
+                android:id="@+id/menu_dump_events"
+                android:title="Dump Events"/>
+            <item
+                android:id="@+id/menu_dump_tags"
+                android:title="Dump Tags"/>
             <item
                 android:id="@+id/menu_add"
                 android:title="AddEdit"/>

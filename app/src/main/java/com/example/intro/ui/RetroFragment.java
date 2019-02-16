@@ -41,7 +41,7 @@ public class RetroFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_retro, container,
                 false);
 
-        // Prepare list, its listener and adapter
+        // Prepare list, its listener and tagsAdapter
         ListView listView = (ListView) view.findViewById(R.id.lvEvents);
         setOnClickListenersForList(listView);
         EventsAdapter adapter = new EventsAdapter(getContext(),

@@ -17,55 +17,120 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+
+            <!-- NAME -->
+            <TextView
+                android:id="@+id/tv_Name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="NAME:" />
+
             <EditText
                 android:id="@+id/et_Name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:hint="Name"
                 android:inputType="textPersonName" />
 
-            <EditText
-                android:id="@+id/et_Tags"
-                android:layout_width="match_parent"
+
+            <!-- CONTENT -->
+            <TextView
+                android:id="@+id/tv_Content"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:ems="10"
-                android:hint="Tags"
-                android:inputType="textMultiLine" />
+                android:text="CONTENT:" />
 
             <EditText
                 android:id="@+id/et_Content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:hint="Content"
                 android:inputType="textMultiLine" />
+
+
+            <!-- TAGS -->
+            <TextView
+                android:id="@+id/tv_Tags"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TAGS:" />
+
+            <LinearLayout
+                android:id="@+id/ll_Tags"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/actv_Tag"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:completionHint="Select a tag"
+                        android:completionThreshold="0" />
+
+                    <Button
+                        android:id="@+id/actv_Clean_Tag"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="X" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/bt_Add_Tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add more" />
+
+
+            <!-- COMMENT -->
+            <TextView
+                android:id="@+id/tv_Comment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="COMMENT:" />
 
             <EditText
                 android:id="@+id/et_Comment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:hint="Comment"
                 android:inputType="textMultiLine" />
 
+
+            <!-- COMPLETE -->
             <CheckBox
                 android:id="@+id/cb_Complete"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Complete" />
 
-            <Button
-                android:id="@+id/bt_save"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Save" />
 
-            <Button
-                android:id="@+id/bt_delete"
-                android:layout_width="wrap_content"
+            <!-- BUTTONS -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Delete" />
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/bt_save"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Save" />
+
+                <Button
+                    android:id="@+id/bt_delete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Delete" />
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>
