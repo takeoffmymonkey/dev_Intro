@@ -29,7 +29,7 @@ public class AddEditActivity extends AppCompatActivity {
 
     Event e;
     ArrayAdapter<String> tagsAdapter;
-    List<String> tags = EventHelper.TagsHelper.getTagsList();
+    String[] tags = EventHelper.TagsHelper.getAllTags();
     List<AutoCompleteTextView> actvsTags = new ArrayList<>();
 
     // UI elements
@@ -73,9 +73,7 @@ public class AddEditActivity extends AppCompatActivity {
     private void setupTags() {
         if (e.isNewEvent()) addTag("", false);
         else {
-            String[] tags = EventHelper.TagsHelper
-                    .parseTags(e.getTags());
-            for (String tag : tags) addTag(tag, false);
+            for (String tag : e.getTags()) addTag(tag, false);
         }
     }
 
@@ -137,12 +135,12 @@ public class AddEditActivity extends AppCompatActivity {
             e.setName(etName.getText().toString());
             e.setContent(etContent.getText().toString());
             e.setComment(etComment.getText().toString());
-            StringBuilder sb = new StringBuilder();
+            StringBuilder tags = new StringBuilder();
             for (AutoCompleteTextView actv : actvsTags) {
-                sb.append(actv.getText().toString());
-                sb.append(",");
+                tags.append(actv.getText().toString());
+                tags.append(",");
             }
-            e.setTags(EventHelper.TagsHelper.sanitizeTags(sb.toString()));
+            e.setTags(EventHelper.TagsHelper.cleanTags(tags.toString()));
 
             // Update DB and inform user
             if (EventHelper.updateDbWithEvent(e)) {

@@ -5,8 +5,9 @@ public class Event {
 
     private long id = 0;
     private String name;
-    private String tags;
+    private String[] tags;
     private long dateCreated;
+    private long dateEdited;
     private long dateComplete;
     private boolean complete;
     private String comment;
@@ -36,13 +37,23 @@ public class Event {
     }
 
 
-    public String getTags() {
+    public String[] getTags() {
         return tags;
     }
 
 
-    public void setTags(String tags) {
+    public void setTags(String[] tags) {
         this.tags = tags;
+    }
+
+
+    public long getDateEdited() {
+        return dateEdited;
+    }
+
+
+    public void setDateEdited(long dateEdited) {
+        this.dateEdited = dateEdited;
     }
 
 
