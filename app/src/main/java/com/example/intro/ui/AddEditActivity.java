@@ -1,12 +1,13 @@
 package com.example.intro.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -28,14 +29,13 @@ public class AddEditActivity extends AppCompatActivity {
 
     Event e;
     ArrayAdapter<String> tagsAdapter;
-    List<String> tags = EventHelper.getTagsList();
+    List<String> tags = EventHelper.TagsHelper.getTagsList();
     List<AutoCompleteTextView> actvsTags = new ArrayList<>();
 
     // UI elements
     EditText etName, etContent, etComment;
     CheckBox cbComplete;
-    Button btAddTag, btCleanTag, btSave, btDelete;
-    AutoCompleteTextView actvTag;
+    Button btAddTag, btSave, btDelete;
 
 
     @Override
@@ -63,47 +63,61 @@ public class AddEditActivity extends AppCompatActivity {
         setSaveButtonListener();
         btDelete = (Button) findViewById(R.id.bt_delete);
         setDeleteButtonListener();
-        if (EventHelper.isNewEvent(e)) btDelete.setVisibility(View.GONE);
-        actvTag = (AutoCompleteTextView) findViewById(R.id.actv_Tag);
-        actvTag.setText(e.getTags());
-        setTagsAdapter(actvTag);
-        actvsTags.add(actvTag);
-        btCleanTag = (Button) findViewById(R.id.actv_Clean_Tag);
-        setCleanTagButtonListener();
+        if (e.isNewEvent()) btDelete.setVisibility(View.GONE);
+        setupTags();
         btAddTag = (Button) findViewById(R.id.bt_Add_Tag);
         setAddTagButtonListener();
     }
 
 
-    private void setCleanTagButtonListener() {
-        btCleanTag.setOnClickListener(view -> {
-            actvTag.setText("");
-        });
+    private void setupTags() {
+        if (e.isNewEvent()) addTag("", false);
+        else {
+            String[] tags = EventHelper.TagsHelper
+                    .parseTags(e.getTags());
+            for (String tag : tags) addTag(tag, false);
+        }
     }
 
 
     private void setAddTagButtonListener() {
         btAddTag.setOnClickListener(view -> {
-            // Create view
-            LayoutInflater li = getLayoutInflater();
-            View vNewTag = li.inflate(R.layout.tags_item_add_edit, null);
-
-            // Set up AutoCompleteTextView and add it to list of actv's
-            AutoCompleteTextView actvNewTag = (AutoCompleteTextView)
-                    vNewTag.findViewById(R.id.actv_Tag_Item);
-            setTagsAdapter(actvNewTag);
-            actvsTags.add(actvNewTag);
-
-            // Set up delete button
-            Button btDelete = (Button) vNewTag.findViewById
-                    (R.id.actv_Kill_Tag_Item);
-            setDeleteTagButtonListener(btDelete, actvNewTag);
-
-            // Add view to parent and set focus
-            ViewGroup parent = (ViewGroup) findViewById(R.id.ll_Tags);
-            parent.addView(vNewTag);
-            actvNewTag.requestFocus();
+            addTag("", true);
         });
+    }
+
+
+    private void addTag(String tag, boolean setFocus) {
+        // Create view
+        LayoutInflater li = getLayoutInflater();
+        View vNewTag = li.inflate(R.layout.tags_item_add_edit, null);
+
+        // Set up AutoCompleteTextView and add it to list of actv's
+        AutoCompleteTextView actvNewTag = (AutoCompleteTextView)
+                vNewTag.findViewById(R.id.actv_Tag_Item);
+        actvNewTag.setText(tag);
+        setTagsAdapter(actvNewTag);
+        actvsTags.add(actvNewTag);
+
+        // Set up delete button
+        Button btDelete = (Button) vNewTag.findViewById
+                (R.id.actv_Kill_Tag_Item);
+        setDeleteTagButtonListener(btDelete, actvNewTag);
+
+        // Add view to parent, set focus and open keyboard
+        ViewGroup parent = (ViewGroup) findViewById(R.id.ll_Tags);
+        parent.addView(vNewTag);
+        if (setFocus) {
+            actvNewTag.requestFocus();
+            InputMethodManager inManager = (InputMethodManager)
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
+            inManager.showSoftInput(actvNewTag, 0);
+        }
+    }
+
+
+    private void setTagsAdapter(AutoCompleteTextView actv) {
+        actv.setAdapter(tagsAdapter);
     }
 
 
@@ -114,11 +128,6 @@ public class AddEditActivity extends AppCompatActivity {
             v.setVisibility(View.GONE);
             actvsTags.remove(actv);
         });
-    }
-
-
-    private void setTagsAdapter(AutoCompleteTextView actv) {
-        actv.setAdapter(tagsAdapter);
     }
 
 
@@ -133,7 +142,7 @@ public class AddEditActivity extends AppCompatActivity {
                 sb.append(actv.getText().toString());
                 sb.append(",");
             }
-            e.setTags(sb.toString());
+            e.setTags(EventHelper.TagsHelper.sanitizeTags(sb.toString()));
 
             // Update DB and inform user
             if (EventHelper.updateDbWithEvent(e)) {
@@ -148,7 +157,7 @@ public class AddEditActivity extends AppCompatActivity {
         });
     }
 
-
+    // TODO: 019 19 фев 19 confirmation
     private void setDeleteButtonListener() {
         btDelete.setOnClickListener(view -> {
             if (EventHelper.deleteEventFromDb(e)) {

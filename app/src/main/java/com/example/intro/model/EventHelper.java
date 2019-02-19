@@ -3,7 +3,9 @@ package com.example.intro.model;
 import android.content.ContentValues;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,11 +25,6 @@ public class EventHelper {
 
     static String tagsTable = dbHelper.TAGS_TABLE;
     static String tagsTagColumn = dbHelper.TAGS_TAG_COLUMN;
-
-
-    public static boolean isNewEvent(Event e) {
-        return e.getId() == 0;
-    }
 
 
     public static Event buildEvent(long id) {
@@ -91,7 +88,7 @@ public class EventHelper {
 
         // Update DB depending on if this is a new Event
         boolean result;
-        if (isNewEvent(e)) result = dbHelper.insertRow(eventsTable,
+        if (e.isNewEvent()) result = dbHelper.insertRow(eventsTable,
                 contentValues, dbHelper.getWritableDatabase());
         else result = dbHelper.updateRow(eventsTable, contentValues,
                 e.getId());
@@ -104,8 +101,37 @@ public class EventHelper {
     }
 
 
-    public static List<String> getTagsList() {
-        String[] tags = dbHelper.getColumn(tagsTable, tagsTagColumn);
-        return Arrays.asList(tags);
+    public static class TagsHelper {
+        public static List<String> getTagsList() {
+            String[] tags = dbHelper.getColumn(tagsTable, tagsTagColumn);
+            return Arrays.asList(tags);
+        }
+
+
+        public static String sanitizeTags(String tags) {
+            String[] tagsArr = tags.split(",");
+            // Remove duplicates and empties
+            List<String> tagsList = new ArrayList<>();
+            for (String tag : tagsArr) {
+                if (!tagsList.contains(tag) && !tag.equals(""))
+                    tagsList.add(tag);
+            }
+
+            // Remove last comma
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < tagsList.size(); i++) {
+                sb.append(tagsList.get(i));
+                if (i == tagsList.size() - 1) break;
+                sb.append(",");
+            }
+
+            return sb.toString();
+        }
+
+
+        public static String[] parseTags(String tags) {
+            return tags.split(",");
+        }
     }
+
 }

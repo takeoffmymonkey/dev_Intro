@@ -126,6 +126,11 @@ public class Event {
     }
 
 
+    public boolean isNewEvent() {
+        return getId() == 0;
+    }
+
+
     @Override
     public String toString() {
         return "Event{" +
