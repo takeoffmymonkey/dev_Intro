@@ -1,4 +1,4 @@
-package com.example.intro.model;
+package com.example.intro.model.helpers;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -28,9 +28,9 @@ public class DbHelper extends SQLiteOpenHelper {
     public final String EVENTS_TABLE = "Events";
     public final String EVENTS_NAME_COLUMN = "Name";
     final String EVENTS_TAGS_COLUMN = "Tags";
-    final String EVENTS_DATE_CREATED_COLUMN = "DateCreated";
-    final String EVENTS_DATE_EDITED_COLUMN = "DateEdited";
-    final String EVENTS_DATE_COMPLETE_COLUMN = "DateComplete";
+    final String EVENTS_TIME_CREATED_COLUMN = "TimeCreated";
+    final String EVENTS_TIME_EDITED_COLUMN = "TimeEdited";
+    final String EVENTS_TIME_COMPLETE_COLUMN = "TimeComplete";
     final String EVENTS_COMPLETE_COLUMN = "Complete";
     final String EVENTS_COMMENT_COLUMN = "Comment";
     final String EVENTS_PRIORITY_COLUMN = "Priority";
@@ -81,11 +81,11 @@ public class DbHelper extends SQLiteOpenHelper {
                                 + EVENTS_NAME_COLUMN + " TEXT "
                                 + "NOT NULL DEFAULT 0, "
                                 + EVENTS_TAGS_COLUMN + " TEXT, "
-                                + EVENTS_DATE_CREATED_COLUMN + " INTEGER "
+                                + EVENTS_TIME_CREATED_COLUMN + " INTEGER "
                                 + "NOT NULL DEFAULT 0, "
-                                + EVENTS_DATE_EDITED_COLUMN + " INTEGER "
+                                + EVENTS_TIME_EDITED_COLUMN + " INTEGER "
                                 + "NOT NULL DEFAULT 0, "
-                                + EVENTS_DATE_COMPLETE_COLUMN + " INTEGER "
+                                + EVENTS_TIME_COMPLETE_COLUMN + " INTEGER "
                                 + "NOT NULL DEFAULT 0, "
                                 + EVENTS_COMPLETE_COLUMN + " INTEGER "
                                 + "NOT NULL DEFAULT 0, "
@@ -102,9 +102,10 @@ public class DbHelper extends SQLiteOpenHelper {
                 SQL_CREATE_TABLE =
                         "CREATE TABLE " + TAGS_TABLE + " ("
                                 + ID_COLUMN + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                                + TAGS_TAG_COLUMN + " TEXT UNIQUE"
+                                + TAGS_TAG_COLUMN + " TEXT UNIQUE "
                                 + "NOT NULL, "
-                                + TAGS_EVENTS_COLUMN + " TEXT);";
+                                + TAGS_EVENTS_COLUMN + " TEXT "
+                                + "NOT NULL DEFAULT " + "\"\"" + ");";
                 break;
         }
 
@@ -150,6 +151,8 @@ public class DbHelper extends SQLiteOpenHelper {
         String[] columns = new String[]{ID_COLUMN};
         try (Cursor c = db.query(table, columns, null, null,
                 null, null, null)) {
+            // TODO: 021 21 фев 19 next id if last was deleted is not 1!
+            if (c.getCount() == 0) return 1;
             c.moveToLast();
             nextId = Long.parseLong(c.getString(c.getColumnIndex(columns[0])));
         }

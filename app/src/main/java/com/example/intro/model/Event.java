@@ -1,19 +1,21 @@
 package com.example.intro.model;
 
+import java.util.Arrays;
+
 public class Event {
     private String TAG = "INTROVERT:" + getClass().getSimpleName();
 
     private long id = 0;
     private String name;
     private String[] tags;
-    private long dateCreated;
-    private long dateEdited;
-    private long dateComplete;
+    private long timeCreated = System.currentTimeMillis();
+    private long timeEdited = System.currentTimeMillis();
+    private long timeComplete;
     private boolean complete;
     private String comment;
-    private int priority;
-    private int icon;
-    private int contentType;
+    private byte priority;
+    private short icon;
+    private byte contentType;
     private String content;
 
 
@@ -47,33 +49,33 @@ public class Event {
     }
 
 
-    public long getDateEdited() {
-        return dateEdited;
+    public long getTimeEdited() {
+        return timeEdited;
     }
 
 
-    public void setDateEdited(long dateEdited) {
-        this.dateEdited = dateEdited;
+    public void setTimeEdited(long timeEdited) {
+        this.timeEdited = timeEdited;
     }
 
 
-    public long getDateCreated() {
-        return dateCreated;
+    public long getTimeCreated() {
+        return timeCreated;
     }
 
 
-    public void setDateCreated(long dateCreated) {
-        this.dateCreated = dateCreated;
+    public void setTimeCreated(long timeCreated) {
+        this.timeCreated = timeCreated;
     }
 
 
-    public long getDateComplete() {
-        return dateComplete;
+    public long getTimeComplete() {
+        return timeComplete;
     }
 
 
-    public void setDateComplete(long dateComplete) {
-        this.dateComplete = dateComplete;
+    public void setTimeComplete(long timeComplete) {
+        this.timeComplete = timeComplete;
     }
 
 
@@ -97,32 +99,32 @@ public class Event {
     }
 
 
-    public int getPriority() {
+    public byte getPriority() {
         return priority;
     }
 
 
-    public void setPriority(int priority) {
+    public void setPriority(byte priority) {
         this.priority = priority;
     }
 
 
-    public int getIcon() {
+    public short getIcon() {
         return icon;
     }
 
 
-    public void setIcon(int icon) {
+    public void setIcon(short icon) {
         this.icon = icon;
     }
 
 
-    public int getContentType() {
+    public byte getContentType() {
         return contentType;
     }
 
 
-    public void setContentType(int contentType) {
+    public void setContentType(byte contentType) {
         this.contentType = contentType;
     }
 
@@ -147,9 +149,9 @@ public class Event {
         return "Event{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", tags='" + tags + '\'' +
-                ", dateCreated=" + dateCreated +
-                ", dateComplete=" + dateComplete +
+                ", tags='" + Arrays.toString(tags) + '\'' +
+                ", timeCreated=" + timeCreated +
+                ", timeComplete=" + timeComplete +
                 ", complete=" + complete +
                 ", comment='" + comment + '\'' +
                 ", priority=" + priority +

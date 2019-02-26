@@ -9,7 +9,6 @@ import android.widget.CursorAdapter;
 import android.widget.TextView;
 
 import com.example.intro.R;
-import com.example.intro.model.DbHelper;
 
 import static com.example.intro.ui.MainActivity.dbHelper;
 

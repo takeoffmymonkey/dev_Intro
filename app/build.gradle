@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 25
     defaultConfig {
-        applicationId "com.example.test"
+        applicationId 'com.galukhin.intro'
         minSdkVersion 10
         targetSdkVersion 25
         versionCode 1
@@ -20,10 +20,12 @@ android {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
     }
+    productFlavors {
+    }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:25.4.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     testImplementation 'junit:junit:4.12'

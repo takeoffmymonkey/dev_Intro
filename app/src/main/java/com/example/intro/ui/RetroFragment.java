@@ -17,6 +17,8 @@ import static com.example.intro.ui.MainActivity.dbHelper;
 public class RetroFragment extends Fragment {
     private String TAG = "INTROVERT:" + getClass().getSimpleName();
     public static String EVENT_ID = "id";
+    EventsAdapter adapter;
+
 
     // newInstance constructor for creating fragment with arguments
     public static RetroFragment newInstance(int page, String title) {
@@ -41,11 +43,10 @@ public class RetroFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_retro, container,
                 false);
 
-        // Prepare list, its listener and tagsAdapter
+        // Prepare list, its listener and adapter
         ListView listView = (ListView) view.findViewById(R.id.lvEvents);
         setOnClickListenersForList(listView);
-        EventsAdapter adapter = new EventsAdapter(getContext(),
-                dbHelper.createNotesCursor());
+        adapter = new EventsAdapter(getContext(), dbHelper.createNotesCursor());
         listView.setAdapter(adapter);
 
         // Prepare Add button
@@ -80,5 +81,14 @@ public class RetroFragment extends Fragment {
                     AddEditActivity.class);
             startActivity(intent);
         });
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (adapter != null) {
+            adapter.getCursor().close();
+        }
     }
 }

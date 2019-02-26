@@ -13,13 +13,20 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.intro.model.AudioPlayer;
 import com.example.intro.model.Event;
-import com.example.intro.model.EventHelper;
+import com.example.intro.model.helpers.EventsHelper;
 import com.example.intro.R;
+import com.example.intro.model.helpers.FilesHelper;
+import com.example.intro.model.helpers.TagsHelper;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static com.example.intro.ui.RetroFragment.EVENT_ID;
@@ -29,13 +36,18 @@ public class AddEditActivity extends AppCompatActivity {
 
     Event e;
     ArrayAdapter<String> tagsAdapter;
-    String[] tags = EventHelper.TagsHelper.getAllTags();
+    String[] tags = TagsHelper.getAllTags();
+    ArrayAdapter<String> priorityAdapter;
+    String[] priorities = {"0", "1", "2", "3", "4", "5"};
     List<AutoCompleteTextView> actvsTags = new ArrayList<>();
 
     // UI elements
+    TextView tvDateCreated, tvDateEdited, tvDateComplete;
     EditText etName, etContent, etComment;
     CheckBox cbComplete;
     Button btAddTag, btSave, btDelete;
+    Button btPlay, btStop, btRecord;
+    Spinner spPriority;
 
 
     @Override
@@ -45,28 +57,60 @@ public class AddEditActivity extends AppCompatActivity {
 
         // Construct Event
         long id = getIntent().getLongExtra(EVENT_ID, 0);
-        e = EventHelper.buildEvent(id);
+        e = EventsHelper.buildEvent(id);
 
-        // Create adapter for tags
+        // Create adapter for tags and priority
         tagsAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1, tags);
+        priorityAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_1, priorities);
 
-        // Add UI elements
+        // Add and setup UI elements
+        tvDateCreated = (TextView) findViewById(R.id.tv_DateCreated);
+        tvDateCreated.setText(new Date(e.getTimeCreated()).toString());
+        tvDateEdited = (TextView) findViewById(R.id.tv_DateEdited);
+        tvDateEdited.setText(new Date(e.getTimeEdited()).toString());
+        tvDateComplete = (TextView) findViewById(R.id.tv_DateComplete);
+        if (e.getTimeComplete() != 0)
+            tvDateComplete.setText(new Date(e.getTimeComplete()).toString());
         etName = (EditText) findViewById(R.id.et_Name);
         etName.setText(e.getName());
         etContent = (EditText) findViewById(R.id.et_Content);
         etContent.setText(e.getContent());
+        setupTags();
+        btAddTag = (Button) findViewById(R.id.bt_Add_Tag);
+        setAddTagButtonListener();
         etComment = (EditText) findViewById(R.id.et_Comment);
         etComment.setText(e.getComment());
+        spPriority = (Spinner) findViewById(R.id.sp_Priority);
+        spPriority.setAdapter(priorityAdapter);
+        spPriority.setSelection(e.getPriority());
         cbComplete = (CheckBox) findViewById(R.id.cb_Complete);
+        cbComplete.setChecked(e.isComplete());
+
         btSave = (Button) findViewById(R.id.bt_save);
         setSaveButtonListener();
         btDelete = (Button) findViewById(R.id.bt_delete);
         setDeleteButtonListener();
         if (e.isNewEvent()) btDelete.setVisibility(View.GONE);
-        setupTags();
-        btAddTag = (Button) findViewById(R.id.bt_Add_Tag);
-        setAddTagButtonListener();
+
+        // Recorder
+        btPlay = (Button) findViewById(R.id.bt_play);
+        btStop = (Button) findViewById(R.id.bt_stop);
+        btRecord = (Button) findViewById(R.id.bt_record);
+
+        FilesHelper fh = new FilesHelper(this);
+        try {
+            fh.createTempDir(fh.getExternal());
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        String file = fh.getTemp().getPath();
+
+
+        file += "recording.3gp";
+        AudioPlayer audio = new AudioPlayer(btPlay, btStop,
+                btRecord, file, this);
     }
 
 
@@ -132,18 +176,27 @@ public class AddEditActivity extends AppCompatActivity {
     private void setSaveButtonListener() {
         btSave.setOnClickListener(view -> {
             // Gather data and pass it to Event object
+            long time = System.currentTimeMillis();
+            if (e.isNewEvent()) {
+                e.setTimeCreated(time);
+                e.setTimeEdited(time);
+            } else e.setTimeEdited(time);
             e.setName(etName.getText().toString());
             e.setContent(etContent.getText().toString());
             e.setComment(etComment.getText().toString());
+            e.setPriority((byte) spPriority.getSelectedItemPosition());
             StringBuilder tags = new StringBuilder();
             for (AutoCompleteTextView actv : actvsTags) {
                 tags.append(actv.getText().toString());
                 tags.append(",");
             }
-            e.setTags(EventHelper.TagsHelper.cleanTags(tags.toString()));
+            e.setTags(TagsHelper.cleanArray(tags.toString()));
+            e.setComplete(cbComplete.isChecked());
+            // TODO: 021 21 фев 19 what if it was complete previously
+            if (e.isComplete()) e.setTimeComplete(time);
 
             // Update DB and inform user
-            if (EventHelper.updateDbWithEvent(e)) {
+            if (EventsHelper.updateDbWithEvent(e)) {
                 Toast.makeText(this, e.getName() + " saved",
                         Toast.LENGTH_SHORT).show();
             }
@@ -158,7 +211,7 @@ public class AddEditActivity extends AppCompatActivity {
     // TODO: 019 19 фев 19 confirmation
     private void setDeleteButtonListener() {
         btDelete.setOnClickListener(view -> {
-            if (EventHelper.deleteEventFromDb(e)) {
+            if (EventsHelper.deleteEventFromDb(e)) {
                 Toast.makeText(this, e.getName()
                                 + " deleted",
                         Toast.LENGTH_SHORT).show();
