@@ -21,10 +21,9 @@ import com.example.intro.model.AudioPlayer;
 import com.example.intro.model.Event;
 import com.example.intro.model.helpers.EventsHelper;
 import com.example.intro.R;
-import com.example.intro.model.helpers.FilesHelper;
+import com.example.intro.model.helpers.Location;
 import com.example.intro.model.helpers.TagsHelper;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -99,18 +98,10 @@ public class AddEditActivity extends AppCompatActivity {
         btStop = (Button) findViewById(R.id.bt_stop);
         btRecord = (Button) findViewById(R.id.bt_record);
 
-        FilesHelper fh = new FilesHelper(this);
-        try {
-            fh.createTempDir(fh.getExternal());
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
-        String file = fh.getTemp().getPath();
-
-
-        file += "recording.3gp";
+        String parent = Location.EXTERNAL.getFullPath(this);
+        Location loc = new Location("", parent + "temp.3gp");
         AudioPlayer audio = new AudioPlayer(btPlay, btStop,
-                btRecord, file, this);
+                btRecord, loc, this);
     }
 
 

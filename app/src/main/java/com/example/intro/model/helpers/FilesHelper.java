@@ -1,131 +1,106 @@
 package com.example.intro.model.helpers;
 
 import android.content.Context;
-import android.os.Environment;
+import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
 
 public class FilesHelper {
-    private Context context;
-
-    private Storage internal;
-    private Storage external;
-    private Storage temp;
+    private static String TAG = "INTROVERT:FilesHelper";
 
 
-    public FilesHelper(Context context) {
-        this.context = context;
-    }
-
-
-    public Storage getInternal() {
-        if (internal == null) {
-            internal = Storage.INTERNAL;
-            internal.file = context.getFilesDir();
-            internal.path = internal.file.getPath();
-        }
-        return internal;
-    }
-
-
-    public Storage getExternal() throws IOException {
-        if (external == null) {
-            if (isExternalStorageWritable()) { // we have write access
-                external = Storage.EXTERNAL;
-                external.file = context.getExternalFilesDir(null);
-                external.path = external.file.getPath();
-            } else throw new IOException(); // we don't have write access
-        }
-        return external;
-    }
-
-
-    public Storage getTemp() {
-        if (temp == null) {
-            try {
-                createTempDir(getExternal());
-            } catch (IOException e) {
-                e.printStackTrace();
-                createTempDir(getInternal()); // no access to external
-            }
-        }
-        return temp;
-    }
-
-
-    public enum Storage {
-        INTERNAL, EXTERNAL, TEMP;
-
-        private File file;
-        private String path;
-
-
-        public File getFile() {
-            return file;
-        }
-
-
-        public String getPath() {
-            return path;
-        }
-    }
-
-
-    private File getDirFile(Storage storage) {
-        return storage.file;
-    }
-
-
-    private String getDirPath(Storage storage) {
-        return storage.path;
-    }
-
-
-    private boolean isExternalStorageWritable() {
-        String state = Environment.getExternalStorageState();
-        return Environment.MEDIA_MOUNTED.equals(state);
-    }
-
-
-    public boolean isLowFreeSpace(Storage storage) {
-        File file = getDirFile(storage);
-        long total = file.getTotalSpace();
-        long free = file.getFreeSpace();
+    public static boolean isLowFreeSpace(Location location, Context context) {
+        long total = location.getFile(context).getTotalSpace();
+        long free = location.getFile(context).getFreeSpace();
         return free < (total * .05);
     }
 
 
-    public boolean deleteFile(File file) {
-        return file.delete();
-    }
-
-
-    public boolean createFile(File file) {
+    /*~~~~~~~~~~~~~~~~~~~~ CREATE ~~~~~~~~~~~~~~~~~~~~ */
+    public static boolean createFile(Location loc, String name, Context c) {
+        File file = new File(loc.getFullPath(c) + name);
         try {
             return file.createNewFile();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
+            return false;
+        }
+    }
+
+    public static boolean[] createFiles(Location loc, String[] names, Context c) {
+        boolean[] results = new boolean[names.length];
+        for (int i = 0; i < names.length; i++) {
+            results[i] = createFile(loc, names[i], c);
+        }
+        return results;
+    }
+
+
+    public static boolean createDir(Location loc, String name, Context c) {
+        return new File(loc.getFullPath(c), name).mkdir();
+    }
+
+
+    public static boolean[] createDirs(Location loc, String[] names, Context c) {
+        boolean[] results = new boolean[names.length];
+        for (int i = 0; i < names.length; i++) {
+            results[i] = createDir(loc, names[i], c);
+        }
+        return results;
+    }
+
+
+    /*~~~~~~~~~~~~~~~~~~~~ DELETE ~~~~~~~~~~~~~~~~~~~~ */
+    public static boolean deleteFile(Location loc, String name, Context c) {
+        File file = new File(loc.getFullPath(c), name);
+        if (file.isFile()) return file.delete();
+        else return false;
+    }
+
+
+    public static boolean[] deleteFiles(Location loc, String[] names, Context c) {
+        boolean[] results = new boolean[names.length];
+        for (int i = 0; i < names.length; i++) {
+            results[i] = deleteFile(loc, names[i], c);
+        }
+        return results;
+    }
+
+
+    public static boolean deleteDir(Location loc, String name, Context c) {
+        File file = new File(loc.getFullPath(c), name); // dir to delete
+        if (file.isDirectory()) {
+            File[] files = file.listFiles(); // files in the dir to delete
+            if (files.length == 0) return file.delete(); // dir is empty
+            else { // dir contains something
+                for (File f : files) {
+                    if (f.isFile()) f.delete(); // it's a file
+                    else { // it's a folder
+                        // create parent as location
+                        String locat = loc.getRelativePath();
+                        locat += file.getName();
+                        Location l = new Location("", locat);
+                        deleteDir(l, f.getName(), c);
+                    }
+                }
+            }
         }
         return false;
     }
 
 
-    public boolean createDir(Storage storage, String relativePath) {
-        File file = new File(storage.file, relativePath);
-        return file.mkdirs();
+    public static boolean[] deleteDirs(Location loc, String[] names, Context c) {
+        boolean[] results = new boolean[names.length];
+        for (int i = 0; i < names.length; i++) {
+            results[i] = deleteDir(loc, names[i], c);
+        }
+        return results;
     }
 
 
-    public boolean createTempDir(Storage storage) {
-        if (storage == Storage.EXTERNAL)
-            if (!isExternalStorageWritable()) return false;
+    /*~~~~~~~~~~~~~~~~~~~~ READ ~~~~~~~~~~~~~~~~~~~~ */
 
-        String tempString = "Temp";
-        temp = Storage.TEMP;
-        File file = new File(storage.file, tempString);
-        temp.file = file;
-        temp.path = file.getPath();
-        return createDir(storage, tempString);
-    }
+
+    /*~~~~~~~~~~~~~~~~~~~~ WRITE ~~~~~~~~~~~~~~~~~~~~ */
 }

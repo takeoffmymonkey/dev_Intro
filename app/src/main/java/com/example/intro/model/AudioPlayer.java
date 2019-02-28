@@ -7,6 +7,7 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.intro.model.helpers.Location;
 import com.example.intro.ui.MainActivity;
 
 import java.io.IOException;
@@ -23,15 +24,15 @@ public class AudioPlayer {
     private Button btStop;
     private Button btRecord;
 
-    private String fileName;
+    private Location file;
 
 
     public AudioPlayer(Button play, Button stop, Button rec,
-                       String file, Activity activity) {
+                       Location file, Activity activity) {
         preparePlayButton(play);
         prepareStopButton(stop);
         prepareRecButton(rec);
-        this.fileName = file;
+        this.file = file;
         this.activity = activity;
     }
 
@@ -77,7 +78,7 @@ public class AudioPlayer {
             recorder = new MediaRecorder();
             recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-            recorder.setOutputFile(fileName);
+            recorder.setOutputFile(file.getFullPath(activity));
             recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
             try {
                 recorder.prepare();
@@ -107,7 +108,7 @@ public class AudioPlayer {
         if (player == null) {
             player = new MediaPlayer();
             try {
-                player.setDataSource(fileName);
+                player.setDataSource(file.getFullPath(activity));
                 player.prepare();
             } catch (IOException e1) {
                 e1.printStackTrace();
