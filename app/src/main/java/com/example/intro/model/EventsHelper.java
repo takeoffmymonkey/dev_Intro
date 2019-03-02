@@ -1,9 +1,7 @@
-package com.example.intro.model.helpers;
+package com.example.intro.model;
 
 import android.content.ContentValues;
 import android.util.Log;
-
-import com.example.intro.model.Event;
 
 import java.util.Map;
 import java.util.Set;
@@ -29,7 +27,6 @@ public class EventsHelper {
     private static String eventsCompleteColumn = dbHelper.EVENTS_COMPLETE_COLUMN;
     private static String eventsPriorityColumn = dbHelper.EVENTS_PRIORITY_COLUMN;
 
-    enum ContentType {TEXT, AUDIO, VALUE}
 
     enum Action {ADD, UPDATE, DELETE}
 

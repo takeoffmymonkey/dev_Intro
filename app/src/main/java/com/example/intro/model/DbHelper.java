@@ -1,4 +1,4 @@
-package com.example.intro.model.helpers;
+package com.example.intro.model;
 
 import android.content.ContentValues;
 import android.content.Context;

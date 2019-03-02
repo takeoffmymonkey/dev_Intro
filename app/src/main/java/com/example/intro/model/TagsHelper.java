@@ -1,9 +1,7 @@
-package com.example.intro.model.helpers;
+package com.example.intro.model;
 
 import android.content.ContentValues;
 import android.support.annotation.Nullable;
-
-import com.example.intro.model.Event;
 
 import java.util.ArrayList;
 import java.util.Arrays;

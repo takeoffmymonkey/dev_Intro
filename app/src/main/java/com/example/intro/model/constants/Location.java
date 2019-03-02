@@ -1,4 +1,4 @@
-package com.example.intro.model.helpers;
+package com.example.intro.model.constants;
 
 import android.content.Context;
 import android.os.Environment;

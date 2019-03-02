@@ -3,12 +3,10 @@ package com.example.intro.model;
 import android.app.Activity;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.example.intro.model.helpers.Location;
-import com.example.intro.ui.MainActivity;
+import com.example.intro.model.constants.Location;
 
 import java.io.IOException;
 

@@ -1,16 +1,15 @@
 package com.example.intro.ui;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.intro.R;
-import com.example.intro.model.helpers.DbHelper;
-import com.example.intro.model.helpers.FilesHelper;
+import com.example.intro.model.DbHelper;
 
 public class MainActivity extends AppCompatActivity {
     private String TAG = "INTROVERT:" + getClass().getSimpleName();

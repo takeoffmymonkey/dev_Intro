@@ -19,10 +19,10 @@ import android.widget.Toast;
 
 import com.example.intro.model.AudioPlayer;
 import com.example.intro.model.Event;
-import com.example.intro.model.helpers.EventsHelper;
+import com.example.intro.model.EventsHelper;
 import com.example.intro.R;
-import com.example.intro.model.helpers.Location;
-import com.example.intro.model.helpers.TagsHelper;
+import com.example.intro.model.constants.Location;
+import com.example.intro.model.TagsHelper;
 
 import java.util.ArrayList;
 import java.util.Date;

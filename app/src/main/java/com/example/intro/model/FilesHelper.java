@@ -1,9 +1,12 @@
-package com.example.intro.model.helpers;
+package com.example.intro.model;
 
 import android.content.Context;
 import android.util.Log;
 
+import com.example.intro.model.constants.Location;
+
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class FilesHelper {
@@ -59,7 +62,8 @@ public class FilesHelper {
     }
 
 
-    public static boolean[] deleteFiles(Location loc, String[] names, Context c) {
+    public static boolean[] deleteFiles(Location loc, String[] names,
+                                        Context c) {
         boolean[] results = new boolean[names.length];
         for (int i = 0; i < names.length; i++) {
             results[i] = deleteFile(loc, names[i], c);
@@ -99,8 +103,46 @@ public class FilesHelper {
     }
 
 
+    /*~~~~~~~~~~~~~~~~~~~~ MOVE ~~~~~~~~~~~~~~~~~~~~ */
+    public static boolean moveFile(Location from, Location to,
+                                   String name, Context c) {
+        File file = new File(from.getFullPath(c), name);
+        return file.renameTo(to.getFile(c));
+    }
+
+
+    public static boolean[] moveFiles(Location from, Location to,
+                                      String[] names, Context c) {
+        boolean[] results = new boolean[names.length];
+        for (int i = 0; i < names.length; i++) {
+            results[i] = moveFile(from, to, names[i], c);
+        }
+        return results;
+    }
+
+
+    public static boolean moveDir(Location from, Location to,
+                                  String name, Context c) {
+        return moveFile(from, to, name, c);
+    }
+
+
+    public static boolean[] moveDirs(Location from, Location to,
+                                     String[] names, Context c) {
+        return moveFiles(from, to, names, c);
+    }
+
+
     /*~~~~~~~~~~~~~~~~~~~~ READ ~~~~~~~~~~~~~~~~~~~~ */
 
 
     /*~~~~~~~~~~~~~~~~~~~~ WRITE ~~~~~~~~~~~~~~~~~~~~ */
+    public static boolean writeFile(Location loc, String name, Context c)
+            throws IOException {
+        File file = new File(loc.getFile(c), name);
+        try (FileOutputStream stream = new FileOutputStream(file)) {
+            stream.write("text-to-write".getBytes());
+        }
+        return true;
+    }
 }
