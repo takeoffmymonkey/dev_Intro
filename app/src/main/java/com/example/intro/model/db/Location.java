@@ -1,4 +1,4 @@
-package com.example.intro.model.constants;
+package com.example.intro.model.db;
 
 import android.content.Context;
 import android.os.Environment;

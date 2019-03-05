@@ -6,7 +6,7 @@ import android.media.MediaRecorder;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.example.intro.model.constants.Location;
+import com.example.intro.model.db.Location;
 
 import java.io.IOException;
 

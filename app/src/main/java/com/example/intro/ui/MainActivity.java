@@ -9,7 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.intro.R;
-import com.example.intro.model.DbHelper;
+import com.example.intro.model.db.DbHelper;
 
 public class MainActivity extends AppCompatActivity {
     private String TAG = "INTROVERT:" + getClass().getSimpleName();

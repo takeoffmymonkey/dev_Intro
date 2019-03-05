@@ -3,7 +3,7 @@ package com.example.intro.model;
 import android.content.Context;
 import android.util.Log;
 
-import com.example.intro.model.constants.Location;
+import com.example.intro.model.db.Location;
 
 import java.io.File;
 import java.io.FileOutputStream;

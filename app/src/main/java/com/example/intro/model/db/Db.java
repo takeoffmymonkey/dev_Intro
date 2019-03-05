@@ -1,30 +1,39 @@
-package com.example.intro.model.constants;
+package com.example.intro.model.db;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 
-import com.example.intro.model.DbHelper;
-
 import java.io.File;
+import java.util.List;
 
 public class Db {
     private String TAG = "INTROVERT:" + getClass().getSimpleName();
 
-    public static String getName() {
-        return "introvert";
+
+    /* ~~~~~ NAME & VERSION ~~~~~ */
+    private static final String NAME = "introvert";
+    private static final int VERSION = 1;
+
+    static String getName() {
+        return NAME;
+    }
+
+    static int getVersion() {
+        return VERSION;
     }
 
 
-    /* ~~~~~~~~~~ DBHELPER ~~~~~~~~~~ */
+    /* ~~~~~ DBHELPER AND DATABASE ~~~~~ */
     private static DbHelper sDbHelper;
 
-    public static DbHelper getDbHelper(Context context) {
+    static SQLiteDatabase getDb(Context context) {
         if (sDbHelper == null) sDbHelper = new DbHelper(context);
-        return sDbHelper;
+        return sDbHelper.getWritableDatabase();
     }
 
 
-    /* ~~~~~~~~~~ INTERNAL/EXTERNAL ~~~~~~~~~~ */
+    /* ~~~~~ INTERNAL/EXTERNAL ~~~~~ */
     private static boolean sExternal;
 
     static boolean isExternal() {
@@ -36,7 +45,7 @@ public class Db {
     }
 
 
-    /* ~~~~~~~~~~ MAIN FOLDER ~~~~~~~~~~ */
+    /* ~~~~~ MAIN FOLDER ~~~~~ */
     private static File sMainFolder;
 
     static File getMainFolder(Context context) {
@@ -51,17 +60,5 @@ public class Db {
         if (isExternal()) return Environment.MEDIA_MOUNTED.equals
                 (Environment.getExternalStorageState());
         else return true;
-    }
-
-
-    /* ~~~~~~~~~~ TABLES ~~~~~~~~~~ */
-    private static Table[] sTables = new Table[]{
-            new Table("Records", null),
-            new Table("Tags", null),
-            new Table("Templates", null),
-    };
-
-    static Table[] getTables() {
-        return sTables;
     }
 }
